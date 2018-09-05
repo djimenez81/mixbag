@@ -1,13 +1,11 @@
-# LESCRITURA
+# MIXBAG
 
 Copyright (c) 2018 David Jimenez.
 
 ## WHAT IS THIS PROJECT
 
-ASLWrite is a writing system for ASL (American Sign Language). The idea of this
-project is to implement a few tools that would allow the writing on this system
-on computer systems, so it can be used for LESCO (Lengua de Señas Costarricense,
-or Costa Rican Sign Language).
+This is a collection of stuff that I have tried to do at different points, that 
+is half way done, but not quite yet. 
 
 david[dot]jimenezlopez[at]ucr[dot]ac[dot]cr
 
