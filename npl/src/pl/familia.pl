@@ -7,6 +7,69 @@
 % Lista de parentescos familiares
 
 % Familia paterna
+
+male(santiago).
+male(luis).
+male(paulino).
+male(rolando).
+male(david).
+male(daniel).
+male(gabriel).
+male(balta).
+male(esteban).
+male(carlos).
+male(josesito).
+male(javi).
+male(ronald).
+male(joel).
+male(emmanuel).
+male(thiago).
+male(diego).
+male(ruben).
+male(estebitan).
+male(nacho).
+male(matias).
+male(arturo).
+male(beto).
+male(jorge).
+male(luisito).
+male(bernie).
+
+female(luz).
+female(gina).
+female(dyala).
+female(cuca).
+female(catalina).
+female(gloriana).
+female(daniela).
+female(maribel).
+female(norma).
+female(eva).
+female(siria).
+female(malamala).
+female(gorgie).
+female(pri).
+female(karina).
+female(yanoa).
+female(valeria).
+female(carolina).
+female(dani).
+female(ale).
+female(cami).
+female(alicia).
+female(elena).
+female(rosa).
+female(sonia).
+female(sissy).
+female(sofi).
+female(vicky).
+female(tati).
+female(nati).
+female(tefy).
+female(coche).
+
+
+
 parent(luz,santiago).
 parent(luz,gina).
 parent(luz,dyala).
@@ -57,7 +120,7 @@ parent(gloriana,emmanuel).
 parent(gloriana,yanoa).
 parent(gloriana,thiago).
 
-parent(jose,valeria).
+parent(josecito,valeria).
 
 parent(georgie,carolina).
 parent(georgie,diego).
@@ -108,6 +171,34 @@ sibling(X,Y) :- parent(Z,X),parent(Z,Y),not(X=Y).
 
 grandparent(X,Y) :- parent(X,Z),parent(Z,Y).
 
-cousin(X,Y) :- grandparent(Z,X),grandparent(Z,Y),not(sibling(X,Y)).
+cousin(X,Y) :- grandparent(Z,X),grandparent(Z,Y),not(sibling(X,Y)),not(X=Y).
 
 uncleaunt(X,Y) :- parent(Z,X),grandparent(Z,Y),not(parent(X,Y)).
+
+coparents(X,Y) :- parent(X,Z),parent(Y,Z).
+
+metamour(X,Y) :- coparents(X,Z),coparents(Y,Z).
+
+mother(X,Y) :- parent(X,Y),female(X).
+
+father(X,Y) :- parent(X,Y),male(X).
+
+daughter(X,Y) :- parent(Y,X),female(X).
+
+son(X,Y) :- parent(Y,X),male(X).
+
+mom(X) :- parent(X,_),female(X).
+
+dad(X) :- parent(X,_),male(X).
+
+granny(X) :- grandparent(X,_),female(X).
+
+granpa(X) :- grandparent(X,_),male(X).
+
+uncle(X,Y) :- uncleaunt(X,Y),male(X).
+
+aunt(X,Y) :- uncleaunt(X,Y),female(X).
+
+nephew(X,Y) :- uncleaunt(Y,X),male(Y).
+
+niece(X,Y) :- uncleaunt(Y,X),female(Y).
