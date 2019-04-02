@@ -87,7 +87,7 @@ class dater:
     def __init__(self,gIdentity,desScore,selfAssessedDes):
         self._genderIdentity    = gIdentity
         self._desirabilityScore = desScore
-        self._selfAssessedDesirability = selfAssessedDes
+        self._selfAssessedDesirability = [selfAssessedDes]
 
 
     #######################
@@ -110,10 +110,21 @@ class datingame:
     _pursuedM = 0
     _suitors  = []
     _pursued  = []
+    _iterT    = 0
 
     ###########
     # CREATOR #
     ###########
+    def __init__(self,N,M,T):
+        self._suitorN  = N
+        self._pursuedM = M
+        self._iterT    = T
+        for n in range(N):
+            self._suitors.append(dater(SUITOR,randint(1,10),randint(1,10)))
+        for m in range (M):
+            self._suitors.append(dater(PURSUED,randint(1,10),randint(1,10)))
+
+
 
     #######################
     # GETTERS AND SETTERS #
