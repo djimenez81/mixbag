@@ -38,7 +38,7 @@
 ##         ##
 #############
 #############
-from random import randint
+from random import randint, shuffle
 
 
 ######################
@@ -48,8 +48,9 @@ from random import randint
 ##                  ##
 ######################
 ######################
-SUITOR  = 'SUITOR'
-PURSUER = 'PURSUER'
+SUITOR     = 'SUITOR'
+PURSUER    = 'PURSUER'
+SCORERANGE = 10
 
 
 
@@ -70,7 +71,7 @@ PURSUER = 'PURSUER'
 #############
 #############
 
-class dater:
+class Dater:
     ##############
     # ATTRIBUTES #
     ##############
@@ -87,12 +88,35 @@ class dater:
     def __init__(self,gIdentity,desScore,selfAssessedDes):
         self._genderIdentity    = gIdentity
         self._desirabilityScore = desScore
-        self._selfAssessedDesirability = [selfAssessedDes]
+        self._selfAssessedDesirability = selfAssessedDes
 
 
     #######################
     # GETTERS AND SETTERS #
     #######################
+    def getGender(self):
+        return self._genderIdentity
+
+    def getDesirabilityScore(self):
+        return self._desirabilityScore
+
+    def getProposalsReceived(self):
+        return self._proposalsReceived
+
+    def getProposalHistory(self):
+        return self._proposalHistory
+
+    def getProposalResponse(self):
+        return self._proposalResponse
+
+    def getSelfAssessedDesirability(self):
+        return self._selfAssessedDesirability
+
+    def getCurrentSelfAssessedDesirability(self):
+        return self._selfAssessedDesirability[-1]
+
+    def setNewSelfAssessedScore(self,score):
+        self._selfAssessedDesirability.append(score)
 
     ###########
     # METHODS #
@@ -102,29 +126,35 @@ class dater:
 
 
 
-class datingame:
+class Datingame:
     ##############
     # ATTRIBUTES #
     ##############
     _suitorN  = 0
     _pursuedM = 0
+    _cycleK   = 0
     _suitors  = []
     _pursued  = []
-    _iterT    = 0
 
     ###########
     # CREATOR #
     ###########
-    def __init__(self,N,M,T):
-        self._suitorN  = N
-        self._pursuedM = M
-        self._iterT    = T
-        for n in range(N):
-            self._suitors.append(dater(SUITOR,randint(1,10),randint(1,10)))
-        for m in range (M):
-            self._suitors.append(dater(PURSUED,randint(1,10),randint(1,10)))
+    def __init__(self,suitors,pursued,cycles):
+        self._suitorN  = suitors
+        self._pursuedM = pursued
+        self._cycleK   = cycles
 
+        for n in range(suitors):
+            actual   = randint(0,SCORERANGE)
+            assessed = randint(0,SCORERANGE)
+            self._suitors.append(Dater(SUITOR,actual,assessed))
 
+        for m in range(pursued):
+            actual   = randint(0,SCORERANGE)
+            assessed = randint(0,SCORERANGE)
+            self._suitors.append(Dater(SUITOR,actual,assessed))
+
+        return 0
 
     #######################
     # GETTERS AND SETTERS #
