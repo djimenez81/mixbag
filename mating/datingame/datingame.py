@@ -51,6 +51,11 @@ from random import randint, shuffle
 SUITOR     = 'SUITOR'
 PURSUER    = 'PURSUER'
 SCORERANGE = 10
+TAU = 1
+SETTLER = 'SETTLER'
+REACHER = 'REACHER'
+
+STRATEGY  = SETTLER
 
 
 
@@ -72,6 +77,10 @@ SCORERANGE = 10
 #############
 
 class Dater:
+    # This class is a simple container for the different attributes that a dater
+    # has on this experiment. Most of the behavior will be contained in the
+    # larger class.
+
     ##############
     # ATTRIBUTES #
     ##############
@@ -81,6 +90,7 @@ class Dater:
     _proposalHistory   = []
     _proposalResponse  = []
     _selfAssessedDesirability = []
+    _proposalScores    = []
 
     ###########
     # CREATOR #
@@ -118,6 +128,20 @@ class Dater:
     def setNewSelfAssessedScore(self,score):
         self._selfAssessedDesirability.append(score)
 
+    def addProposal(self,proposal):
+        self._proposalsReceived.append(proposal)
+
+    def add2ProposalHistory(self):
+        self._proposalHistory.append(self._proposalsReceived)
+        self._proposalsReceived = []
+
+    def addProposalScore(self,k):
+        self._proposalScore.append(k)
+
+    def addProposalResponse(self.k):
+        self._proposalResponse.append(k)
+
+
     ###########
     # METHODS #
     ###########
@@ -154,12 +178,53 @@ class Datingame:
             assessed = randint(0,SCORERANGE)
             self._suitors.append(Dater(SUITOR,actual,assessed))
 
-        return 0
-
     #######################
     # GETTERS AND SETTERS #
     #######################
+    def getSuitors(self):
+        return self._suitors
+
+    def getPursued(self):
+        return self._pursued
+
+    def getSuitorNumber(self):
+        return self._suitorN
+
+    def getPursuedNumber(self):
+        return self._pursuedM
+
+    def getCycles(self):
+        return self._cycleK
 
     ###########
     # METHODS #
     ###########
+    def makeProposals(self):
+        for n in range(self._suitorN):
+            courtingList = list(range(self._pursuedM))
+            shuffle(courtingList)
+            M = self._pursuedM
+            scoreS = self._suitors[n].getCurrentSelfAssessedDesirability()
+            k = 0
+            flag = True
+            while flag:
+                scoreP = self._pursued[courtingList[k]
+                            ].getCurrentSelfAssessedDesirability()
+                if STRATEGY == SETTLER:
+                    if abs(scoreP-scoreS) <= TAU:
+                        self._pursued[courtingList[k]].addProposal(courtingList[k])
+                        self._suitors[n].addProposalScore(scoreP)
+                        flag = False
+                    else:
+                        k += 1
+                        if k >= M:
+                            flag = False
+                else:
+                    if scoreS <= scoreP:
+                        self._pursued[courtingList[k]].addProposal(courtingList[k])
+                        self._suitors[n].addProposalScore(scoreP)
+                        flag = False
+                    else:
+                        k += 1
+                        if k >= M:
+                            flag = False
