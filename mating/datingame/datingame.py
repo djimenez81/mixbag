@@ -298,8 +298,18 @@ class Datingame:
                         self._pursued[m].addProposalResponse(0)
 
 
-    def updateProposals(self):
+    def updateScores(self):
         for n in range(self._suitorN):
             self._suitors[n].updateSelfAssessedDesirabilityScore()
         for m in range(self._pursued):
             self._pursued[m].updateSelfAssessedDesirabilityScore()
+
+
+    def doCycle(self):
+        self.makeProposals()
+        self.considerProposals()
+        self.updateScores()
+
+    def run(self):
+        for k in range(self._cycleK):
+            self.doCycle()
