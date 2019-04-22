@@ -35,6 +35,24 @@ male(jorge).
 male(luisito).
 male(bernie).
 
+
+
+male(tytos).
+male(tywin).
+male(tyrion).
+male(jaime).
+male(joffrey).
+male(tommen).
+male(emmon_frey).
+male(kevan).
+male(lancel).
+male(martyn).
+male(willem).
+male(tyrek).
+male(gerion).
+
+
+
 female(luz).
 female(gina).
 female(dyala).
@@ -67,6 +85,18 @@ female(tati).
 female(nati).
 female(tefy).
 female(coche).
+
+
+female(jeyne_marbrand).
+female(joanna).
+female(cersei).
+female(myrcella).
+female(genna).
+female(dorna).
+female(janei).
+female(darlessa_marbrand).
+female(joy_hill).
+
 
 
 
@@ -165,6 +195,57 @@ parent(sissy,bernie).
 parent(sofi,tefy).
 parent(sofi,coche).
 
+% Lanister
+
+parent(tytos,tywin).
+parent(tytos,genna).
+parent(tytos,kevan).
+parent(tytos,tyggett).
+parent(tytos,gerion).
+
+parent(jeyne_marbrand,tywin).
+parent(jeyne_marbrand,genna).
+parent(jeyne_marbrand,kevan).
+parent(jeyne_marbrand,tyggett).
+parent(jeyne_marbrand,gerion).
+
+parent(tywin,cersei).
+parent(tywin,jaime).
+parent(tywin,tyrion).
+
+parent(joanna,cersei).
+parent(joanna,jaime).
+parent(joanna,tyrion).
+
+parent(cersei,joffrey).
+parent(cersei,myrcella).
+parent(cersei,tommen).
+
+parent(jaime,joffrey).
+parent(jaime,myrcella).
+parent(jaime,tommen).
+
+parent(kevan,lancel).
+parent(kevan,martyn).
+parent(kevan,willem).
+parent(kevan,janei).
+
+parent(dorna,lancel).
+parent(dorna,martyn).
+parent(dorna,willem).
+parent(dorna,janei).
+
+parent(tyggett,tyrek).
+
+parent(darlessa_marbrand,tyrek).
+
+parent(gerion,joy_hill).
+
+partners(genna,emmon_frey).
+partners(X,Y) :- coparents(X,Y).
+
+
+
 % REGLAS.
 
 sibling(X,Y) :- parent(Z,X),parent(Z,Y),not(X=Y).
@@ -202,3 +283,14 @@ aunt(X,Y) :- uncleaunt(X,Y),female(X).
 nephew(X,Y) :- uncleaunt(Y,X),male(Y).
 
 niece(X,Y) :- uncleaunt(Y,X),female(Y).
+
+
+genealogy(A,D) :- parent(A,D),
+                  write(D),
+                  write(' <=1= '),
+                  write(A).
+
+genealogy(A,D) :- parent(A,X),
+                  genealogy(X,D),
+                  write(' <=2= '),
+                  write(A).
