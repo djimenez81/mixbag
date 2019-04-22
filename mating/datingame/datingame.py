@@ -79,7 +79,7 @@ STRATEGY  = SETTLER
 class Dater:
     # This class is a simple container for the different attributes that a dater
     # has on this experiment. Most of the behavior will be contained in the
-    # larger class.
+    # larger class, with the exception of the updating of the desirability score.
 
     ##############
     # ATTRIBUTES #
@@ -98,7 +98,7 @@ class Dater:
     def __init__(self,gIdentity,desScore,selfAssessedDes):
         self._genderIdentity    = gIdentity
         self._desirabilityScore = desScore
-        self._selfAssessedDesirability = selfAssessedDes
+        self._selfAssessedDesirability = [selfAssessedDes]
 
 
     #######################
@@ -219,6 +219,8 @@ class Datingame:
                         k += 1
                         if k >= M:
                             flag = False
+                            self._suitors[n].addProposalScore(-1)
+                            self._suitors[n].addProposalScore(0)
                 else:
                     if scoreS <= scoreP:
                         self._pursued[courtingList[k]].addProposal(courtingList[k])
@@ -228,3 +230,42 @@ class Datingame:
                         k += 1
                         if k >= M:
                             flag = False
+                            self._suitors[n].addProposalScore(-1)
+                            self._suitors[n].addProposalScore(0)
+
+
+    def considerProposals(self):
+        for m in range(self._pursuedM):
+            suitorsList = self._pursued[m].getProposalsReceived()
+            L = len(suitorsList)
+            if L == 0:
+                # This is the case where this particular pursued individual was
+                # not proposition by anyone.
+                self._pursued[m].add2ProposalHistory()
+                self._pursued[m].addProposalResponse(-1)
+            else:
+                # The suitor list should be randomized in order to avoid giving
+                # preference because of order.
+                myScore = self._pursued[m].getCurrentSelfAssessedDesirability()
+                shuffle(suitorsList)
+                currentScore = -1
+                maxScore = -1
+                maxChoice = -1
+                for n in range(L):
+                    currentScore = self._suitors[suitorsList[n]].getDesirabilityScore()
+                    if currentScore > maxScore:
+                        if maxChoice >= 0:
+                            self._suitors[maxChoice].addProposalResponse(0)
+                        maxChoice = suitorsList[n]
+                        maxScore  = currentScore
+                    else:
+                        self._suitors[suitorsList[n]].addProposalResponse(0)
+                self._pursued9
+                if maxChoice >= 0:
+                    self._pursued[m].add2ProposalHistory()
+                    if maxScore >= myScore:
+                        self._suitors[maxChoice].addProposalResponse(1)
+                        self._pursued[m].addProposalResponse(-1)
+                    else:
+                        self._suitors[maxChoice].addProposalResponse(0)
+                        self._pursued[m].addProposalResponse(maxScore)
