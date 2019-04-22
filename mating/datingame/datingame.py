@@ -52,6 +52,7 @@ SUITOR     = 'SUITOR'
 PURSUER    = 'PURSUER'
 SCORERANGE = 10
 TAU = 1
+PERSV = 3 # Perseverance Parameter
 SETTLER = 'SETTLER'
 REACHER = 'REACHER'
 
@@ -116,7 +117,7 @@ class Dater:
     def getProposalHistory(self):
         return self._proposalHistory
 
-    def getProposalResponse(self):
+    def getProposalResponses(self):
         return self._proposalResponse
 
     def getSelfAssessedDesirability(self):
@@ -145,12 +146,37 @@ class Dater:
     ###########
     # METHODS #
     ###########
+    def updateSelfAssessedDesirabilityScore(self):
+        scores    = self.getSelfAssessedDesirability()
+        responses = self.getProposalResponses()
+        myScore   = self.getCurrentSelfAssessedDesirability()
+        # NOTE: scores and responses should have the same length. It might
+        #       be a good idea to check this, and correct it if not.
+        if len(responses) >= PERSV:
+            # if there are not yet enough data points, then the suitor will
+            # not reconsider its score.
+            elif sum(responses[-PERSV:]) == 0:
+                # In this case, the last PERSV cycles, the suitor has been
+                # rejected. We need to analize if the scores has been the
+                # same during all these cyces.
+                if len(set(scores[-PERSV:])) == 1:
+                    # In this case, the score has not changed in the last
+                    # PERSV cycles, and thus, needs to change.
+                    if myScore > 1
+                        myScore -= 1
+            elif responses[-1] == 1 and scores[-1] > myScore:
+                # In this case, the suitor has been accepted by a mate with
+                # a higher score than himself in the last cycle.
+                myScore += 1
+        self.setNewSelfAssessedScore(myScore)
 
 
 
 
 
 class Datingame:
+    # This class contains the logic of the simulation, and most of the behavior.
+
     ##############
     # ATTRIBUTES #
     ##############
@@ -220,7 +246,7 @@ class Datingame:
                         if k >= M:
                             flag = False
                             self._suitors[n].addProposalScore(-1)
-                            self._suitors[n].addProposalScore(0)
+                            self._suitors[n].addProposalResponse(0)
                 else:
                     if scoreS <= scoreP:
                         self._pursued[courtingList[k]].addProposal(courtingList[k])
@@ -231,7 +257,7 @@ class Datingame:
                         if k >= M:
                             flag = False
                             self._suitors[n].addProposalScore(-1)
-                            self._suitors[n].addProposalScore(0)
+                            self._suitors[n].addProposalResponse(0)
 
 
     def considerProposals(self):
@@ -263,9 +289,17 @@ class Datingame:
                 self._pursued9
                 if maxChoice >= 0:
                     self._pursued[m].add2ProposalHistory()
+                    self._pursued[m].addProposalScore(maxScore)
                     if maxScore >= myScore:
                         self._suitors[maxChoice].addProposalResponse(1)
-                        self._pursued[m].addProposalResponse(-1)
+                        self._pursued[m].addProposalResponse(1)
                     else:
                         self._suitors[maxChoice].addProposalResponse(0)
-                        self._pursued[m].addProposalResponse(maxScore)
+                        self._pursued[m].addProposalResponse(0)
+
+
+    def updateProposals(self):
+        for n in range(self._suitorN):
+            self._suitors[n].updateSelfAssessedDesirabilityScore()
+        for m in range(self._pursued):
+            self._pursued[m].updateSelfAssessedDesirabilityScore()
