@@ -56,7 +56,7 @@ PERSV = 3 # Perseverance Parameter
 SETTLER = 'SETTLER'
 REACHER = 'REACHER'
 
-STRATEGY  = SETTLER
+STRATEGY  = REACHER
 
 
 
@@ -137,9 +137,9 @@ class Dater:
         self._proposalsReceived = []
 
     def addProposalScore(self,k):
-        self._proposalScore.append(k)
+        self._proposalScores.append(k)
 
-    def addProposalResponse(self.k):
+    def addProposalResponse(self,k):
         self._proposalResponse.append(k)
 
 
@@ -155,14 +155,14 @@ class Dater:
         if len(responses) >= PERSV:
             # if there are not yet enough data points, then the suitor will
             # not reconsider its score.
-            elif sum(responses[-PERSV:]) == 0:
+            if sum(responses[-PERSV:]) == 0:
                 # In this case, the last PERSV cycles, the suitor has been
                 # rejected. We need to analize if the scores has been the
                 # same during all these cyces.
                 if len(set(scores[-PERSV:])) == 1:
                     # In this case, the score has not changed in the last
                     # PERSV cycles, and thus, needs to change.
-                    if myScore > 1
+                    if myScore > 1:
                         myScore -= 1
             elif responses[-1] == 1 and scores[-1] > myScore:
                 # In this case, the suitor has been accepted by a mate with
@@ -202,7 +202,7 @@ class Datingame:
         for m in range(pursued):
             actual   = randint(0,SCORERANGE)
             assessed = randint(0,SCORERANGE)
-            self._suitors.append(Dater(SUITOR,actual,assessed))
+            self._pursued.append(Dater(SUITOR,actual,assessed))
 
     #######################
     # GETTERS AND SETTERS #
@@ -227,9 +227,9 @@ class Datingame:
     ###########
     def makeProposals(self):
         for n in range(self._suitorN):
-            courtingList = list(range(self._pursuedM))
-            shuffle(courtingList)
             M = self._pursuedM
+            courtingList = list(range(M))
+            shuffle(courtingList)
             scoreS = self._suitors[n].getCurrentSelfAssessedDesirability()
             k = 0
             flag = True
@@ -268,7 +268,7 @@ class Datingame:
                 # This is the case where this particular pursued individual was
                 # not proposition by anyone.
                 self._pursued[m].add2ProposalHistory()
-                self._pursued[m].addProposalResponse(-1)
+                self._pursued[m].addProposalResponse(0)
             else:
                 # The suitor list should be randomized in order to avoid giving
                 # preference because of order.
@@ -286,7 +286,7 @@ class Datingame:
                         maxScore  = currentScore
                     else:
                         self._suitors[suitorsList[n]].addProposalResponse(0)
-                self._pursued9
+                # self._pursued9
                 if maxChoice >= 0:
                     self._pursued[m].add2ProposalHistory()
                     self._pursued[m].addProposalScore(maxScore)
@@ -301,7 +301,7 @@ class Datingame:
     def updateScores(self):
         for n in range(self._suitorN):
             self._suitors[n].updateSelfAssessedDesirabilityScore()
-        for m in range(self._pursued):
+        for m in range(self._pursuedM):
             self._pursued[m].updateSelfAssessedDesirabilityScore()
 
 
