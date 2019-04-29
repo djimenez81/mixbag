@@ -52,13 +52,14 @@ import pdb
 
 SCORERANGE = 10
 TAU = 1
-PERSV = 2 # Perseverance Parameter
+# PERSV = 2 # Perseverance Parameter
 
 
 
 SETTLER = 'SETTLER'
 REACHER = 'REACHER'
 
+# STRATEGY  = REACHER
 STRATEGY  = SETTLER
 
 
@@ -111,28 +112,6 @@ class DatingGame:
                             for k in range (pursued)
                         ]
 
-
-    #######################
-    # GETTERS AND SETTERS #
-    #######################
-
-    '''
-    def getSuitors(self):
-        return self._suitors
-
-    def getPursued(self):
-        return self._pursued
-
-    def getSuitorNumber(self):
-        return self._suitorN
-
-    def getPursuedNumber(self):
-        return self._pursuedM
-
-    def getCycles(self):
-        return self._cycleK
-    '''
-
     ###########
     # METHODS #
     ###########
@@ -146,7 +125,7 @@ class DatingGame:
             for m in courtingList:
                 scoreP = self._pursued[m][DESCORE]
                 if STRATEGY == SETTLER:
-                    if abs(scoreP-scoreS) <= TAU:
+                    if 0 <= scoreP-scoreS <= TAU:
                         self._pursued[m][PROPLIST].append(n)
                         self._suitors[n][SCORELST].append(scoreP)
                         break
@@ -189,12 +168,8 @@ class DatingGame:
                 if self._suitors[n][SCORELST][-1] > myScore:
                     if myScore < SCORERANGE:
                         myScore += 1
-            elif len(self._suitors[n][RESPLIST]) >= PERSV:
-                if sum(self._suitors[n][RESPLIST][-PERSV:]) == 0:
-                    if len(list(set(self._suitors[n][ASSCORE][-PERSV:]))) == 1:
-                        if myScore >= self._suitors[n][SCORELST][-1]:
-                            if myScore > 0:
-                                myScore -= 1
+            elif self._suitors[n][SCORELST][-1] <= myScore:
+                myScore -= 1
             self._suitors[n][ASSCORE].append(myScore)
         for m in range(self._pursuedM):
             # Let's update now the scores of the pursued.
@@ -202,17 +177,12 @@ class DatingGame:
             if len(self._pursued[m][PROPHIST][-1]) > 0:
                 if max(self._pursued[m][PROPHIST][-1]) > myScore:
                     if myScore < SCORERANGE:
-                        myScore +=1
-            elif len(self._pursued[m][PROPHIST]) >= PERSV:
-                proponents = [ number
-                               for sublist in
-                               self._pursued[m][PROPHIST][-PERSV:]
-                               for number in sublist
-                             ]
-                if len(proponents) == 0 or max(proponents) < myScore:
-                    if len(list(set(self._suitors[n][ASSCORE][-PERSV:]))) == 1:
-                        if myScore > 0:
-                            myScore -= 1
+                        myScore += 1
+                elif max(self._pursued[m][PROPHIST][-1]) < myScore:
+                    if myScore > 0:
+                        myScore -= 1
+            elif myScore > 0:
+                myScore -= 1
             myScore = self._pursued[m][ASSCORE].append(myScore)
 
 
@@ -222,14 +192,16 @@ class DatingGame:
         self.considerProposals()
         self.updateScores()
 
+
     def run(self):
         for k in range(self._cycleK):
             self.doCycle()
 
+
     def doStatistics(self,values):
         statistics = []
-        ofPursued = ['Pursued']
-        ofSuitors = ['Suitors']
+        ofPursued = []
+        ofSuitors = []
         for val in values:
             stats = [[] for k in range(SCORERANGE + 1)]
             for suitor in self._suitors:
