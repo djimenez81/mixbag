@@ -59,7 +59,7 @@ PERSV = 2 # Perseverance Parameter
 SETTLER = 'SETTLER'
 REACHER = 'REACHER'
 
-STRATEGY  = REACHER
+STRATEGY  = SETTLER
 
 
 
@@ -148,7 +148,7 @@ class DatingGame:
                 if STRATEGY == SETTLER:
                     if abs(scoreP-scoreS) <= TAU:
                         self._pursued[m][PROPLIST].append(n)
-                        self._suitors[n][SCORELIST].append(scoreP)
+                        self._suitors[n][SCORELST].append(scoreP)
                         break
                 else:
                     if scoreS <= scoreP:
@@ -192,8 +192,9 @@ class DatingGame:
             elif len(self._suitors[n][RESPLIST]) >= PERSV:
                 if sum(self._suitors[n][RESPLIST][-PERSV:]) == 0:
                     if len(list(set(self._suitors[n][ASSCORE][-PERSV:]))) == 1:
-                        if myScore > 0:
-                            myScore -= 1
+                        if myScore >= self._suitors[n][SCORELST][-1]:
+                            if myScore > 0:
+                                myScore -= 1
             self._suitors[n][ASSCORE].append(myScore)
         for m in range(self._pursuedM):
             # Let's update now the scores of the pursued.
@@ -227,8 +228,8 @@ class DatingGame:
 
     def doStatistics(self,values):
         statistics = []
-        ofPursued = []
-        ofSuitors = []
+        ofPursued = ['Pursued']
+        ofSuitors = ['Suitors']
         for val in values:
             stats = [[] for k in range(SCORERANGE + 1)]
             for suitor in self._suitors:
