@@ -39,6 +39,7 @@
 #############
 #############
 from random import randint, shuffle
+import multiprocessing as mp
 import pdb
 
 
@@ -80,6 +81,39 @@ PROPLIST = 3 # Position of the proposal list.
 ##         ##
 #############
 #############
+
+
+def runSimulation(idx):
+    dagame = DatingGame(500,500,400)
+    dagame.run()
+    st = dagame.doStatistics([50,100,200,400])
+    return st
+
+
+def multiSim(L):
+    indices = list(range(L))
+    pool = mp.Pool(mp.cpu_count())
+    results = pool.map(runSimulation, [idx for idx in indices])
+    return results
+
+def processResults(results):
+    K = len(results[0][0][0])
+    N = len(results[0][0])
+    M = len(results[0])
+    R = len(results)
+    processed = [[[0 for k in range(K)] for n in range(N)] for m in range(M)]
+    for result in results:
+        for k in range(K):
+            for n in range(N):
+                for m in range(M):
+                    processed[m][n][k] += result[m][n][k]
+    for k in range(K):
+        for n in range(N):
+            for m in range(M):
+                processed[m][n][k] /= R
+    return processed
+
+
 
 
 #############
@@ -187,7 +221,6 @@ class DatingGame:
 
 
     def doCycle(self):
-        # pdb.set_trace()
         self.makeProposals()
         self.considerProposals()
         self.updateScores()
