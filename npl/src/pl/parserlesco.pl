@@ -1,4 +1,4 @@
-% Archivo: 04-b-parser_list.pl
+% Archivo: parlesco.pl
 % Fecha: [2019-05-06]
 % Modifcicación: [2019-04-09]
 % Versión: 001
