@@ -21,7 +21,9 @@
 oracion --> sintagma_nominal(G,N),sintagma_verbal(N).
 
 sintagma_nominal(G,N) --> determinante(G,N),nombre(G,N).
+sintagma_nominal(G,N) --> nombre(G,N),adjetivo(G,N).
 sintagma_nominal(G,N) --> determinante(G,N),nombre(G,N),adjetivo(G,N).
+sintagma_nominal(G,N) --> determinante(G,N),adjetivo(G,N),nombre(G,N).
 sintagma_nominal(G,N) --> nombre_propio(G,N).
 
 sintagma_verbal(N) --> verbo(N),sintagma_nominal(_,_).
