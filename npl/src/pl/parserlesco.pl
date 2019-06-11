@@ -16,8 +16,10 @@
 
 % Oracion 23 debe ser poco azucar no azucar poco.
 % Oracion 24 debe ser "esos sordo amigo"
+% Oraciones 26 y 30 estan repetidas
+% Oracion 34 "CASADO" y no "CASADA".
 
-% Ultima hecha 25
+% Ultima hecha 36
 
 
 %%%%%%%%%%%%%%
@@ -95,6 +97,7 @@ det(5) --> [primero];
 %%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%
 nom --> [abuelo];
+        [almohada];
         [bola];
         [carro];
         [casa];
@@ -103,16 +106,23 @@ nom --> [abuelo];
         [doctor];
         [examen];
         [esposo];
+        [guayaba];
+        [hijo];
         [iglesia];
+        [libro];
         [manzana];
         [minuto];
+        [mujer];
+        [nino];
         [pelicula];
         [persona];
         [perro];
+        [pollo];
         [problema];
         [profesor];
         [queque];
         [sordo];
+        [suegro];
         [vez].
 
 
@@ -124,22 +134,30 @@ nom --> [abuelo];
 %%             %%
 %%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%
-adj --> [blanco];
+adj --> [aburrido];
+        [acido];
+        [blanco];
         [bonito];
         [bueno];
         [caliente];
+        [cansado];
+        [casado];
         [dificil];
         [enfermo];
         [enojado];
         [frio];
+        [frito];
         [gordo];
         [grande];
         [hombre];
         [lluvioso];
+        [morena];
         [mujer];
+        [negro];
         [nuevo];
         [perdido];
         [profesor];
+        [suave];
         [verde];
         [viejo].
 
