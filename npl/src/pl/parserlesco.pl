@@ -1,76 +1,159 @@
 % Archivo: parlesco.pl
 % Fecha: [2019-05-06]
-% Modifcicación: [2019-04-09]
-% Versión: 001
+% Modifcicación: [2019-06-10]
+% Versión: 002
 % Autor: David Jimenez
 %
 
-% sintagma_nominal --> sintagma_nominal, calificativo.
-sintagma_nominal --> determinante_d, sintagma_nominal_d.
-sintagma_nominal --> sintagma_nominal_d.
 
-sintagma_nominal_d --> determinante_po, sintagma_nominal_po.
-sintagma_nominal_d --> sintagma_nominal_po.
+%%%%%%%%%%%%%
+%%%%%%%%%%%%%
+%%         %%
+%%  NOTAS  %%
+%%         %%
+%%%%%%%%%%%%%
+%%%%%%%%%%%%%
 
-sintagma_nominal_po --> determinante_pr, sintagma_nominal_pr.
-sintagma_nominal_po --> sintagma_nominal_pr.
+% Oracion 23 debe ser poco azucar no azucar poco.
+% Oracion 24 debe ser "esos sordo amigo"
 
-sintagma_nominal_pr --> determinante_cc, sintagma_nominal_cc.
-sintagma_nominal_pr --> sintagma_nominal_cc.
-
-sintagma_nominal_cc --> determinante_co, sintagma_nominal_co.
-sintagma_nominal_cc --> sintagma_nominal_co.
-
-sintagma_nominal_co --> nombre, calificacion.
-sintagma_nominal_co --> nombre.
-
-calificacion --> calificativo, calificacion.
-calificacion --> calificativo.
+% Ultima hecha 25
 
 
-% DETERMINANTES DEMOSTRATIVOS
-determinante_d --> [este].
-determinante_d --> [ese].
-determinante_d --> [aquel].
+%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%
+%%          %%
+%%  REGLAS  %%
+%%          %%
+%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%
+
+sing_det --> det(1), sing_det_1.
+sing_det --> sing_det_1.
+
+sing_det_1 --> det(2), sing_det_2.
+sing_det_1 --> sing_det_2.
+
+sing_det_2 --> det(3), sing_det_3.
+sing_det_2 --> sing_det_3.
+
+sing_det_3 --> det(4), sing_det_4.
+sing_det_3 --> sing_det_4.
+
+sing_det_4 --> det(5), sing_nom.
+sing_det_4 --> sing_nom.
+
+sing_nom --> nom, sing_adj.
+sing_nom --> nom.
+
+sing_adj --> adj, sing_adj.
+sing_adj --> adj.
 
 
-% DETERMINANTES POSESIVOS
-determinante_po --> pronombre.
+%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%
+%%                 %%
+%%  DETERMINANTES  %%
+%%                 %%
+%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%
 
-% DETERMINANTES PREDETERMINANTES
-determinante_pr --> [otro].
-determinante_pr --> [todo].
+det(1) --> [aquel];
+           [ese];
+           [esos];
+           [este].
+
+det(2) --> [mi];
+           [tu];
+           [su];
+           [nuestro].
+
+det(3) --> [otro];
+           [todo].
+
+det(4) --> [un];
+           [uno];
+           [dos];
+           [tres];
+           [cuatro];
+           [cinco];
+           [quince];
+           [mucho];
+           [poco];
+           [todo].
+
+det(5) --> [primero];
+           [segundo];
+           [ultimo].
 
 
-% DETERMINANTES CUANTIFICADORES DE CANTIDAD
-determinante_cc --> [un].
-determinante_cc --> [uno].
-determinante_cc --> [dos].
-determinante_cc --> [tres].
-determinante_cc --> [cuatro].
-determinante_cc --> [cinco].
+%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+%%           %%
+%%  NOMBRES  %%
+%%           %%
+%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+nom --> [abuelo];
+        [bola];
+        [carro];
+        [casa];
+        [dia];
+        [dinero];
+        [doctor];
+        [examen];
+        [esposo];
+        [iglesia];
+        [manzana];
+        [minuto];
+        [pelicula];
+        [persona];
+        [perro];
+        [problema];
+        [profesor];
+        [queque];
+        [sordo];
+        [vez].
 
-determinante_cc --> [mucho].
-determinante_cc --> [todo].
-
-% DETERMINANTES CUANTIFICADORES DE ORDEN
-determinante_co --> [primero].
-determinante_co --> [segundo].
 
 
-% NOMBRES
-nombre --> [doctor].
-nombre --> [perro].
+%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%
+%%             %%
+%%  ADJETIVOS  %%
+%%             %%
+%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%
+adj --> [blanco];
+        [bonito];
+        [bueno];
+        [caliente];
+        [dificil];
+        [enfermo];
+        [enojado];
+        [frio];
+        [gordo];
+        [grande];
+        [hombre];
+        [lluvioso];
+        [mujer];
+        [nuevo];
+        [perdido];
+        [profesor];
+        [verde];
+        [viejo].
 
-% CALIFICATIVOS
-calificativo --> [hombre].
-calificativo --> [grande].
 
-% PRONOMBRES
-pronombre --> [yo].
-pronombre --> [usted].
-pronombre --> [el].
-pronombre --> [ella].
-pronombre --> [nosotros].
-pronombre --> [ustedes].
-pronombre --> [ellos].
+%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
+%%              %%
+%%  PRONOMBRES  %%
+%%              %%
+%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
+pro_nom --> [yo];
+            [tu];
+            [el];
+            [nosotros];
+            [ustedes];
+            [ellos].
