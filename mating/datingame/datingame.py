@@ -30,6 +30,25 @@
 #         David Jimenez <david.jimenezlopez@ucr.ac.cr>
 
 
+#
+# USAGE:
+#
+# For the proyect in question, the following commands were run once for each
+# stragegy:
+#
+# >>> from datingame import *
+# >>> results = multiSim(100)
+# >>> processed = processResults(results)
+#
+# Remember, on these simulations, the suitors could proceed according to two
+# different strategies, that we coined SETTLER and REACHER, in honor to the
+# 13th episode of the fifth season of How I met your mother.
+#
+# If you are going to run this code, remember to change the STRATEGY line
+# accodingly.
+#
+
+
 
 #############
 #############
@@ -53,7 +72,6 @@ import pdb
 
 SCORERANGE = 10
 TAU = 1
-# PERSV = 2 # Perseverance Parameter
 
 
 
@@ -84,9 +102,9 @@ PROPLIST = 3 # Position of the proposal list.
 
 
 def runSimulation(idx):
-    dagame = DatingGame(500,500,400)
+    dagame = DatingGame(500,500,25)
     dagame.run()
-    st = dagame.doStatistics([50,100,200,400])
+    st = dagame.doStatistics([10,25])
     return st
 
 
