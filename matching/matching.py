@@ -124,6 +124,7 @@ def galeShapley(maleOptions, femaleOptions):
                         femaleMatches[k] = femaleOptions[k][theMin]
                         maleMatches[femaleMatches[k]] = k
                         proposals[k].remove(femaleMatches[k])
+                        # Random line of code to test shit
 
         # The third step is to deal with rejections.
         # The fourth step is to compute the unmatched ammount.
