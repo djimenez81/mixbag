@@ -1,5 +1,5 @@
 from matching import *
-fo = generateOptions(4)
-mo = generateOptions(4)
+fo = generateOptions(10)
+mo = generateOptions(10)
 match = galeShapley(mo,fo)
 match

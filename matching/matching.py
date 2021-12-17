@@ -105,7 +105,6 @@ def galeShapley(maleOptions, femaleOptions):
                 propos.append([n,k])
         for k in range(N):
             proposals.append([pair[0] for pair in propos if pair[1] == k])
-        prop2 = deepcopy(proposals)
         # The second step is to see which proposals will be accepted.
         for k in range(N):
             thisProposals = proposals[k]
@@ -124,14 +123,19 @@ def galeShapley(maleOptions, femaleOptions):
                         femaleMatches[k] = femaleOptions[k][theMin]
                         maleMatches[femaleMatches[k]] = k
                         proposals[k].remove(femaleMatches[k])
-                        # Random line of code to test shit
-
         # The third step is to deal with rejections.
+        for k in range(N):
+            thisRejections = proposals[k]
+            for n in thisRejections:
+                rejections.append([n,k])
+        for pair in rejections:
+            maleOptions[pair[0]].remove(pair[1])
+            femaleOptions[pair[1]].remove(pair[0])
         # The fourth step is to compute the unmatched ammount.
-        # These are test commands
-        unmatched = 0
-    matches = [propos,prop2, proposals,maleMatches,femaleMatches]
-#    matches = [propos,proposals]
+        unmatched = femaleMatches.count(-1)
+    matches = []
+    for n in range(N):
+        matches.append([maleMatches[n],femaleMatches[n]])
     return matches
 
 
