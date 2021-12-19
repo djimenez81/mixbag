@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # module matching
 
-# Copyright (c) 2022 Universidad de Costa Rica
+# Copyright (c) 2022 David Jimenez
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Principal Investigator:
-#         David Jimenez <david.jimenezlopez@ucr.ac.cr>
+#         David Jimenez <djimenez81@gmail.com>
 
 
 #
@@ -72,6 +72,96 @@ from copy import deepcopy
 #############
 # def methodName(attribute):
 #     pass
+
+def polyMatching(degrees,choices):
+    # This method attempts to reproduce the Gale-Shapley algorithm for when:
+    #  1 - Everyone can propose by or be proposed to anyone by themselves.
+    #  2 - Not everyone is a suitable partner for someone else, this is, n might
+    #      not consider k at all and would never be paired with them.
+    #  3 - Each node has a maximum number of edges for which it can be an
+    #      extreme.
+    #
+    # INPUT
+    #  - degrees: list of the individual maximum degree of each node.
+    #  - choices: The prioritized list of possible matches for a node.
+    #
+    # OUTPUT
+    #  - matches: List of the matches given for each node.
+    #
+    flag = True
+    N = len(degrees)
+    unmatched  = [[k for k in choices[n] if n in choices[k]] for n in range(N)]
+    rejected   = [[] for n in range(N)]
+    matched    = [[] for n in range(N)]
+    # Test Commands
+    K = 0
+    while flag:
+        # First, compute the proposals.
+        proposals = []
+        for n in range(N):
+            if len(matched[n]) < degrees[n] and len(unmatched[n]) > 0:
+                proposals.append([n,unmatched[n][0]])
+        proplist = [[] for n in range(N)]
+        for n in range(N):
+            for prop in proposals:
+                if prop[1] == n:
+                    proplist[n].append(prop[0])
+        # Second, compute the accepts and rejects for each member.
+        # Third, reconfigure the bookkeeping for next round.
+        # Fourth, calculate if it is time to stop
+        # Test Commands
+        K += 1
+        if K > 0:
+            flag = False
+    return [unmatched,proposals,proplist]
+
+
+def generatePolyMatchingData(N, degMin, degMax, matchMin, matchMax):
+    # This method is used to generate data to for the polyamorous version of the
+    # Gale-Shapley algorithm to solve the Stable Marriage Problem. The algorithm
+    # does not check for the suitability of the inputs, assumes they are given
+    # correctly.
+    #
+    # INPUT
+    #  - N: Total number of individuals involved. N is a positive integer, N>2.
+    #
+    #  - degMin: The minimum number of relations anyone can stablish. That is,
+    #            the maximum degree of any vertex in the graph with
+    #            1<degMin<=degMax. It should be a positive integer.
+    #
+    #  - degMax: The maximum number of relations anyone can stablish. That is,
+    #            the maximum degree of any vertex in the graph. degMax < N-1. It
+    #            should be a positive integer.
+    #
+    #  - matchMin: Minumum number of prospects that any participant should ask.
+    #              In general, the individual minimum of matches should be less
+    #              than or equal to the individual degree, but in this case, for
+    #              simplicity, we agree that matchMin > degMax. It should be an
+    #              integer.
+    #
+    #  - matchMax: Maximum number of prospects that can be chosen by each
+    #              individual. It should be an integer satisfying
+    #              matchMin <= matchMax < N.
+    #
+    #
+    # OUTPUT
+    #  - degrees: A list containing the maximum number of edges per vertex.
+    #
+    #  - choices: The prioritized list of possible matches for someone.
+    #
+    choices = []
+    # Generate the degrees
+    degrees = [randint(degMin,degMax) for n in range(N)]
+    # Generate the choices
+    for n in range(N):
+        thisChoice = list(range(N))
+        thisChoice.remove(n)
+        shuffle(thisChoice)
+        choiceNum = randint(matchMin,matchMax)
+        choices.append(thisChoice[:choiceNum])
+    return degrees, choices
+
+
 
 def galeShapley(maleOptions, femaleOptions):
     # This is my implementation of the Gale Shapley algorithm. It assumes the
