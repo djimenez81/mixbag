@@ -93,6 +93,7 @@ def polyMatching(degrees,choices):
     unmatched  = [[k for k in choices[n] if n in choices[k]] for n in range(N)]
     rejected   = [[] for n in range(N)]
     matched    = [[] for n in range(N)]
+    choices    = deepcopy(unmatched)
     # Test Commands
     K = 0
     while flag:
@@ -107,13 +108,56 @@ def polyMatching(degrees,choices):
                 if prop[1] == n:
                     proplist[n].append(prop[0])
         # Second, compute the accepts and rejects for each member.
+        for n in range(N):
+            for k in proplist[n]:
+                if k not in matched[n]:
+                    matched[n].append(k)
+                    matched[k].append(n)
+        for n in range(N):
+            tempList = [k for k in choices[n] if k in matched[n]]
+            matched[n] = tempList
+        diff = [max([len(matched[n])-degrees[n],0])  for n in range(N)]
+        while sum(diff) > 0:
+            idx = diff.index(max(diff))
+            val = matched[idx].pop()
+            matched[val].remove(idx)
+            rejected[idx].append(val)
+            rejected[val].append(idx)
+            diff = [max([len(matched[n])-degrees[n],0])  for n in range(N)]
         # Third, reconfigure the bookkeeping for next round.
+        for n in range(N):
+            tempList = []
+            for k in choices[n]:
+                if k not in matched[n]:
+                    if k not in rejected[n]:
+                        tempList.append(k)
+            if len(tempList) > 0:
+                unmatched[n] = deepcopy(tempList)
+            elif len(rejected[n]) > 0:
+                unmatched[n] = deepcopy(rejected[n])
+                rejected[n] = []
         # Fourth, calculate if it is time to stop
+        for n in range(N):
+            K = 0
+            if len(matched[n]) < degrees[n]:
+                flag = False
+#         diff = [abs(len(matched[n])-degrees[n]) for n in range(N)]
+#         if sum(diff) == 0:
+#             flag = False
+#         else:
+#             pass
         # Test Commands
-        K += 1
-        if K > 0:
-            flag = False
-    return [unmatched,proposals,proplist]
+#         K += 1
+#         if K > 0:
+#             flag = False
+#         print(choices)
+#         print(unmatched)
+#         print(proposals)
+#         print(proplist)
+#         print(matched)
+#         print(rejected)
+        print('---------')
+    return matched
 
 
 def generatePolyMatchingData(N, degMin, degMax, matchMin, matchMax):
