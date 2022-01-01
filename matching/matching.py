@@ -49,6 +49,7 @@
 #############
 from random import randint, shuffle
 from copy import deepcopy
+from math import sqrt
 # import multiprocessing as mp
 # import pdb
 
@@ -90,12 +91,67 @@ def polyMatching(degrees,choices):
     #
     flag = True
     N = len(degrees)
+    choices   = [[k for k in choices[n] if n in choices[k]] for n in range(N)]
+    matched   = [[] for n in range(N)]
+    proposals = deepcopy(choices)
+    maxima = [N for k in range(N)]
+    K = 0
+    while flag:
+        for n in range(N):
+            tempList = matched[n] + proposals[n]
+            templist = [k for k in choices[n] if k in tempList]
+            matched[n] = deepcopy(templist)
+        diff = [max([len(matched[n])-degrees[n],0])  for n in range(N)]
+        while sum(diff) > 0:
+            idx = diff.index(max(diff))
+            val = matched[idx].pop()
+            matched[val].remove(idx)
+            diff = [max([len(matched[n])-degrees[n],0])  for n in range(N)]
+        for n in range(N):
+            if len(matched[n]) > 0:
+                maxima[n] = choices[n].index(matched[n][-1])
+            else:
+                maxima[n] = N
+        proposals = [[] for n in range(N)]
+        for n in range(N):
+            for k in range(n+1,N):
+                if k in choices[n] and n in choices[k]:
+                    if choices[n].index(k) < maxima[n]:
+                        if choices[k].index(n) < maxima[k]:
+                            proposals[n].append(k)
+                            proposals[k].append(n)
+        tempList = [len(proposals[n]) for n in range(N)]
+        if sum(tempList) == 0:
+            flag = False
+        K += 1
+        if K > sqrt(N):
+            flag = False
+    return K
+
+
+def polyMatchingOld(degrees,choices):
+    # This method attempts to reproduce the Gale-Shapley algorithm for when:
+    #  1 - Everyone can propose by or be proposed to anyone by themselves.
+    #  2 - Not everyone is a suitable partner for someone else, this is, n might
+    #      not consider k at all and would never be paired with them.
+    #  3 - Each node has a maximum number of edges for which it can be an
+    #      extreme.
+    #
+    # INPUT
+    #  - degrees: list of the individual maximum degree of each node.
+    #  - choices: The prioritized list of possible matches for a node.
+    #
+    # OUTPUT
+    #  - matches: List of the matches given for each node.
+    #
+    flag = True
+    N = len(degrees)
     unmatched  = [[k for k in choices[n] if n in choices[k]] for n in range(N)]
     rejected   = [[] for n in range(N)]
     matched    = [[] for n in range(N)]
     choices    = deepcopy(unmatched)
     # Test Commands
-    K = 0
+    J = 0
     while flag:
         # First, compute the proposals.
         proposals = []
@@ -134,29 +190,34 @@ def polyMatching(degrees,choices):
             if len(tempList) > 0:
                 unmatched[n] = deepcopy(tempList)
             elif len(rejected[n]) > 0:
-                unmatched[n] = deepcopy(rejected[n])
+                tempList = [k for k in choices[n] if k in rejected[n]]
+                unmatched[n] = deepcopy(tempList)
                 rejected[n] = []
         # Fourth, calculate if it is time to stop
+        K = 0
         for n in range(N):
-            K = 0
-            if len(matched[n]) < degrees[n]:
-                flag = False
-#         diff = [abs(len(matched[n])-degrees[n]) for n in range(N)]
-#         if sum(diff) == 0:
-#             flag = False
-#         else:
-#             pass
+            L = [choices[n].index(k) for k in matched[n]]
+            if len(L) > 0:
+                daMax = max(L)
+            else:
+                daMax = N
+            L = [k for k in choices[n] if k not in matched[n] and
+                                          choices[n].index(k) < daMax]
+            for k in L:
+                LL = [choices[k].index(j) for j in matched[k]]
+                if len(LL) == 0:
+                    K += 1
+                else:
+                    theirMax = max(LL)
+                    ourPos = choices[k].index(n)
+                    if ourPos < theirMax:
+                        K += 1
+        if K == 0:
+            flag = False
         # Test Commands
-#         K += 1
-#         if K > 0:
-#             flag = False
-#         print(choices)
-#         print(unmatched)
-#         print(proposals)
-#         print(proplist)
-#         print(matched)
-#         print(rejected)
-        print('---------')
+        J += 1
+        if J > 2*N:
+            flag = False
     return matched
 
 
