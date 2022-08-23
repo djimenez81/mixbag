@@ -4,7 +4,7 @@ def countMessages(fileName):
     reader = open(fileName,'r')
     list_of_lines = reader.readlines()
     for line in list_of_lines:
-        if line.find('/21,') != -1:
+        if line.find('/21,') != -1 or line.find('/22,') != -1 :
             aa = line.find(':')
             aa += 6
             nuLine = line[aa:]
