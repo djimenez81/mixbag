@@ -59,6 +59,12 @@ COLA    = "COLA"
 PROCESO = "PROCESO"
 DESVIO  = "DESVIO"
 
+# Decitions for whether
+RETAINED = "RETAINED"
+RELEASED = "RELEASED"
+UNSTATED = "UNSTATED"
+
+
 
 #############
 #############
@@ -141,6 +147,12 @@ class Cola:
         # moment.
         return len(self._queueContent) == 0
 
+    def advanceClock(self):
+        # This method advances the clock of all the transports currently in the
+        # queue.
+        for transport in self._queueContent:
+            transport.advanceClock()
+
 
 class Proceso:
     # This class implements a particular process in the simulation. It simply
@@ -185,6 +197,80 @@ class Proceso:
     def isThereSpace(self):
         # This method vefiries if there is space in the queue
         return len(self._present) < self._capacity
+
+    def advanceClock(self):
+        # This method advances the clock of all the transports currently in the
+        # process.
+        for transport in self._attendingList:
+            transport.advanceClock()
+
+
+class DesvioAleatorio:
+    # This class implements a point where a transport can either go for an
+    # additional steo pr not.
+
+    ##############
+    # ATTRIBUTES #
+    ##############
+
+    ###########
+    # CREATOR #
+    ###########
+    def __init__(self, name, chance):
+        self._name = name
+        self._chance = chance
+        self._queueContent = []
+        self._maximumCapacity = 1
+        self._myType = DESVIO
+        self._decision = UNSTATED
+
+    #######################
+    # GETTERS AND SETTERS #
+    #######################
+    def getName(self):
+        return self._name
+
+    def getMaximumCapacity(self):
+        return self._maximumCapacity
+
+    def getQueue(self):
+        return self._queueContent
+
+    def setName(self,nombre):
+        self._name = nombre
+
+    def setMaximumCapacity(self,maxCap):
+        self._maximumCapacity = maxCap
+
+    def getMyType(self):
+        return self._myType
+
+
+    ###########
+    # METHODS #
+    ###########
+    def decide(self):
+        # This method decides if the transport goes one way or the other.
+        x = np.random.rand()
+        if x < self._chance:
+            self._decision = RETAINED
+        else:
+            self._decision = RELEASED
+
+    def isRetained(self):
+        return self._decision == RETAINED
+
+    def release(self):
+        self._decision == UNSTATED
+        return self._queueContent.pop()
+
+    def advanceClock(self):
+        # This method advances the clock of all the transports currently in the
+        # fork.
+        for transport in self._queueContent:
+            transport.advanceClock()
+
+
 
 
 class Transporte:
@@ -256,40 +342,14 @@ class Transporte:
         # specific time.
         return self._readyToMove
 
+    def advanceClock(self):
+        # This method advances the clock of the transport.
+        self._currentWait += 1
+
     def resetWait(self):
         # This method records the current wait time, and resets it to zero.
         self._watingTimes.append(self._currentWait)
         self._currentWait = 0
-
-
-class DesvioAleatorio:
-    # This class implements a point where a transport can either go for an
-    # additional steo pr not.
-
-    ##############
-    # ATTRIBUTES #
-    ##############
-
-    ###########
-    # CREATOR #
-    ###########
-    def __init__(self, name, chance):
-        self._name = name
-        self._chance = chance
-        self._queueContent = []
-        self._maximumCapacity = 1
-        self._myType = DESVIO
-
-    #######################
-    # GETTERS AND SETTERS #
-    #######################
-    def getMyType(self):
-        return self._myType
-
-
-    ###########
-    # METHODS #
-    ###########
 
 
 class Simulacion:
@@ -310,6 +370,7 @@ class Simulacion:
         self._currentTransportCount = 0
         self._backwardSequence = []
         self._operating = False
+        self._currentClockTime = 0
 
     #######################
     # GETTERS AND SETTERS #
@@ -332,13 +393,24 @@ class Simulacion:
     # METHODS #
     ###########
     def isOperating(self):
+        # This method checks if, within the simulation, the services (processes)
+        # are open at the time.
         return self._operating
 
     def openOperation(self):
+        # This method opens the services within the simulation.
         self._operating = True
 
     def closeOperation(self):
-        self._operating = False 
+        # This method closes the services within the simulation.
+        self._operating = False
+
+    def advanceClock():
+        # This method simply advances the clock on the whole simulation. It
+        # should be run at the end of each cycle.
+        self._currentClockTime += 1
+        for thing in self._sequence:
+            thing.advanceClock()
 
     def run(self):
         # This method contains most of the logic of the simulation, regulating
