@@ -59,6 +59,10 @@ COLA    = "COLA"
 PROCESO = "PROCESO"
 DESVIO  = "DESVIO"
 
+# Open and close tags
+OPEN  = "OPEN"
+CLOSE = "CLOSE"
+
 # Decitions for whether
 RETAINED = "RETAINED"
 RELEASED = "RELEASED"
@@ -132,7 +136,7 @@ class Cola:
         return len(self._queueContent) < self._maximumCapacity
 
     def addTransport(self,transport):
-        # This method adds a transpor to the beginning of the queue.
+        # This method adds a transport to the beginning of the queue.
         if len(self._queueContent) < self._maximumCapacity:
             self._queueContent.append(transport)
         else:
@@ -153,6 +157,28 @@ class Cola:
         for transport in self._queueContent:
             transport.advanceClock()
 
+    def queueLength(self):
+        # This method returns the number of elements currently in the queue.
+        return len(self._queueContent)
+
+    def addNewTransport(self,transport):
+        # This method uses the transport method to be liberated (that means,
+        # the transport can move at any time) and adds it to the queue.
+        transport.liberate()
+        self._queueContent.append(transport)
+
+    def availableTransport(self):
+        # This method returns true if there is at least one transport in the
+        # queue that can move at the present time. As any transport in the queue
+        # can move as soon as it is the first in line, it returns false if and
+        # only if the queue is empty.
+        return len(self._queueContent) > 0
+
+    def liberateTransport(self):
+        # This returns the first transport in the queue.
+        transport = self._queueContent.pop(0)
+        return transport
+
 
 class Proceso:
     # This class implements a particular process in the simulation. It simply
@@ -167,11 +193,13 @@ class Proceso:
     ###########
     # CREATOR #
     ###########
-    def __init__(self,name,capacity):
+    def __init__(self,name,capacity, mean, stdev):
         self._name = name
         self._capacity = capacity
         self._attendingList = []
         self._myType = PROCESO
+        self._mean = mean
+        self._stdev = stdev
 
     #######################
     # GETTERS AND SETTERS #
@@ -196,13 +224,44 @@ class Proceso:
     ###########
     def isThereSpace(self):
         # This method vefiries if there is space in the queue
-        return len(self._present) < self._capacity
+        return len(self._attendingList) < self._capacity
 
     def advanceClock(self):
         # This method advances the clock of all the transports currently in the
         # process.
         for transport in self._attendingList:
             transport.advanceClock()
+
+    def queueLength(self):
+        # This method returns the number of elements currently in the process.
+        return len(self._attendingList)
+
+    def availableTransport(self):
+        # This method checks if any of the elements in the process has finished
+        # and can move.
+        available = False
+        for transport in self._attendingList:
+            available |= transport.canMove()
+
+    def addNewTransport(self, transport):
+        # This method adds a new transport to the process.
+        time = max(1,np.random.normal(self._mean, self._stdev))
+        transport.setProcessWait(time)
+        transport.detain()
+        self._attendingList.append(transport)
+
+    def liberateTransport():
+        index = -1
+        k = 0
+        while k < range(len(self._attendingList)) and index < 0:
+            if self._attendingList[k].canMove():
+                index = k
+        transport = self._attendingList.pop(index)
+        return transport
+
+    def checkIfAnyoneIsDone(self):
+        for transport in self._attendingList:
+            transport.checkIfDone()
 
 
 class DesvioAleatorio:
@@ -249,6 +308,9 @@ class DesvioAleatorio:
     ###########
     # METHODS #
     ###########
+    def isThereSpace(self):
+        return len(self._queueContent) == 0
+
     def decide(self):
         # This method decides if the transport goes one way or the other.
         x = np.random.rand()
@@ -269,6 +331,31 @@ class DesvioAleatorio:
         # fork.
         for transport in self._queueContent:
             transport.advanceClock()
+
+    def queueLength(self):
+        # This method returns the number of elements currently in the queue.
+        return len(self._queueContent)
+
+    def availableTransport(self):
+        # This method returns true if there is at least one transport in the
+        # fork that can move at the present time. As there can be only one
+        # transport in the fork, and  it can move immediately (but it can only
+        # to the preset site given by the decision, the method returns false if
+        # and only if the queue is empty.
+        return len(self._queueContent) > 0
+
+    def addNewTransport(self,transport):
+        if np.random.uniform() < self._chance:
+            self._decision = RETAINED
+        else:
+            self._decision = RELEASED
+        transport.liberate()
+        self._queueContent.append(transport)
+
+    def liberateTransport(self):
+        self._decision = UNSTATED
+        transport = self._queueContent.pop()
+        return transport
 
 
 
@@ -331,11 +418,13 @@ class Transporte:
     def liberate(self):
         # This method sets the transport ready to move when in a process.
         self._readyToMove = True
+        self.resetWait()
 
     def detain(self):
         # This method sets the transport as detained, that is, is not able to
         # move on the process until the time process waiting time is over.
         self._readyToMove = False
+        self.resetWait()
 
     def canMove(self):
         # This method returns True if the transport is able to move at the
@@ -350,6 +439,10 @@ class Transporte:
         # This method records the current wait time, and resets it to zero.
         self._watingTimes.append(self._currentWait)
         self._currentWait = 0
+
+    def checkIfDone(self):
+        if self._processWait < self._currentWait:
+            self.liberate()
 
 
 class Simulacion:
@@ -371,6 +464,10 @@ class Simulacion:
         self._backwardSequence = []
         self._operating = False
         self._currentClockTime = 0
+        self._cyclesPerPeriod = 0
+        self._periodsPerDay = 1
+        self._schedules = {}
+        self._transportAdditionLambdas[]
 
     #######################
     # GETTERS AND SETTERS #
@@ -387,7 +484,8 @@ class Simulacion:
     def getBackwardSequence(self):
         return self._backwardSequence
 
-
+    def getCyclesPerPeriod(self):
+        return self._cyclesPerPeriod
 
     ###########
     # METHODS #
@@ -416,4 +514,96 @@ class Simulacion:
         # This method contains most of the logic of the simulation, regulating
         # the flow of transport through the sequence of queues, forks and
         # processes.
-        pass
+
+        # We define the place where we will store the information
+        resultTable = []
+
+        # First we check if it is time to close or to open the place.
+        N = self._currentClockTime // self._cyclesPerPeriod
+        R = self._currentClockTime %  self._cyclesPerPeriod
+        M = N % self._periodsPerDay
+
+        if R == 0:
+            if M in self._schedules[CLOSE]:
+                self.closeOperation()
+            else:
+                self.openOperation()
+
+        # Second, we add as many
+        P = N % len(self._transportAdditionLambdas)
+        L = self._transportAdditionLambdas[P]
+        K = np.random.poisson(L)
+        for k in range(K):
+            if self._currentTransportCount < self._transportNumber:
+                transport = Transporte(self._currentTransportCount)
+                self._sequence[0].addNewTransport(transport)
+                self._currentTransportCount += 1
+
+        # Now, if the service is closed, all you have to do is to advance the
+        # clock.
+        if not self.isOperating():
+            for estado in self._sequence:
+                if estado.getMyType() == PROCESO:
+                    estado.checkIfAnyoneIsDone()
+            self.advanceClock()
+        else:
+            # This is the case where the service is actually operating.
+
+            # First, for each transport on a process, we figure out if it is
+            # done with it.
+            for estado in self._sequence:
+                if estado.getMyType() == PROCESO:
+                    estado.checkIfAnyoneIsDone()
+
+            # Second check if there are transports that are getting out of the
+            # entire sequence. We assume that the last element in the sequence
+            # is of class Proceso.
+            while self._sequence[-1].availableTransport():
+                transport = self._sequence[-1].liberateTransport()
+                transport.resetWait()
+                L = transport.getWaitingTimes()
+                L.reverse()
+                K = sum(L)
+                L.append(K)
+                L.append(self._currentClockTime)
+                L.append(transport.getCode())
+                L.reverse()
+                resultTable.append(L)
+
+            # Third, in a reverse the sequence to see if transports can move.
+            k = len(self._sequence)
+            while k > 1:
+                k -= 1
+                currentProcess = self._sequence[k]
+                if currentProcess.isThereSpace():
+                    indices = self._backwardSequence[k]
+                    if len(indices) >1:
+                        for index in indices:
+                            previousProcess - self._sequence[index]
+                            while currentProcess.isThereSpace() and
+                                    previousProcess.availableTransport():
+                                transport = previousProcess.liberateTransport()
+                                currentProcess.addNewTransport(transport)
+
+                    else:
+                        previousProcess = self._sequence[indices[0]]
+                        while currentProcess.isThereSpace() and \
+                               previousProcess.availableTransport():
+                            transport = previousProcess.liberateTransport()
+                            currentProcess.addNewTransport(transport)
+
+            # In this case, the last thing to do is to advance the clock.
+            self.advanceClock()
+
+        # Finally, we check if the simulation run is over.
+        if not self._currentTransportCount < self._transportNumber:
+            totalTransportCount = 0
+            # Do whatever we need to finish the run.
+            for stage in self._sequence:
+                totalTransportCount += stage.queueLength()
+            if totalTransportCount == 0:
+                return resultTable
+        if self._currentClockTime > self._transportNumber**2:
+            # This is a fail safe in case we are buggy.This section can be
+            # deleted once tested.
+            return resultTable
