@@ -467,7 +467,7 @@ class Simulacion:
         self._cyclesPerPeriod = 0
         self._periodsPerDay = 1
         self._schedules = {}
-        self._transportAdditionLambdas[]
+        self._transportAdditionLambdas = []
 
     #######################
     # GETTERS AND SETTERS #
@@ -580,7 +580,7 @@ class Simulacion:
                     if len(indices) >1:
                         for index in indices:
                             previousProcess - self._sequence[index]
-                            while currentProcess.isThereSpace() and
+                            while currentProcess.isThereSpace() and \
                                     previousProcess.availableTransport():
                                 transport = previousProcess.liberateTransport()
                                 currentProcess.addNewTransport(transport)
