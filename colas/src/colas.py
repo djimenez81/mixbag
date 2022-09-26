@@ -487,6 +487,12 @@ class Simulacion:
     def getCyclesPerPeriod(self):
         return self._cyclesPerPeriod
 
+    def getAdditionLambdas(self):
+        return self._transportAdditionLambdas
+
+    def setAdditionLambdas(self,lambdas):
+        self._transportAdditionLambdas = lambdas
+
     ###########
     # METHODS #
     ###########
@@ -503,12 +509,15 @@ class Simulacion:
         # This method closes the services within the simulation.
         self._operating = False
 
-    def advanceClock():
+    def advanceClock(self):
         # This method simply advances the clock on the whole simulation. It
         # should be run at the end of each cycle.
         self._currentClockTime += 1
         for thing in self._sequence:
             thing.advanceClock()
+
+    def addSequenceElement(self,element):
+        self._sequence.append(element)
 
     def run(self):
         # This method contains most of the logic of the simulation, regulating
