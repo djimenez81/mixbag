@@ -20,6 +20,13 @@ from colas import *
 # VARIABLES FOR SIMULACION #
 ############################
 TOTAL_NUMBER_OF_TRANSPORTS = 1  # MAXIMUM NUMBER OF TRANSPORTS IN THE SIMULATION
+LAMBDAS = [.003404, .020867, .020461, .020144,
+		   .003404, .024524, .002688, .022317,
+		   .003404, .027704, .029354, .023989,
+		   .003404, .028195, .028155, .022686,
+		   .003404, .027952, .029158, .022500,
+		   .003404, .029355, .029147, .024383,
+		   .003404, .027035, .027692, .020855]
 
 
 
@@ -94,19 +101,61 @@ TRAMITE_ASPERSION_CAP   = 1
 TRAMITE_ASPERSION_MEDIA = 30.12
 TRAMITE_ASPERSION_STDEV = 9.50
 
-########################################
-# VARIABLES FOR COLA CONTROL NICARAGUA #
-########################################
+###############################################
+# VARIABLES FOR COLA POLICE CONTROL NICARAGUA #
+###############################################
 COLA_CONTROL_NICARAGUA_NAME = "COLA CONTROL NICARAGUA"
-COLA_CONTROL_NICARAGUA_CAP  = 4
+COLA_CONTROL_NICARAGUA_CAP  = 3
 
-######################################
-# VARIABLES FOR MIGRACION NICARAGUA #
-########################################
-TRAMITE_CONTROL_NICARAGUA_NAME  = "ASPERSION"
+##########################################
+# VARIABLES FOR POLICE CONTROL NICARAGUA #
+##########################################
+TRAMITE_CONTROL_NICARAGUA_NAME  = "CONTROL POLICIAL NICARAGUA"
 TRAMITE_CONTROL_NICARAGUA_CAP   = 1
-TRAMITE_CONTROL_NICARAGUA_MEDIA = 117.5
-TRAMITE_CONTROL_NICARAGUA_STDEV = 40   
+TRAMITE_CONTROL_NICARAGUA_MEDIA = 82.5
+TRAMITE_CONTROL_NICARAGUA_STDEV = 20.75
+
+##########################################
+# VARIABLES FOR COLA MIGRACION NICARAGUA #
+##########################################
+COLA_MIGRACION_NICARAGUA_NAME = "COLA MIGRACION NICARAGUA"
+COLA_MIGRACION_NICARAGUA_CAP  = 1
+
+#####################################
+# VARIABLES FOR MIGRACION NICARAGUA #
+#####################################
+TRAMITE_MIGRACION_NICARAGUA_NAME  = "MIGRACION NICARAGUA"
+TRAMITE_MIGRACION_NICARAGUA_CAP   = 1
+TRAMITE_MIGRACION_NICARAGUA_MEDIA = 33.3
+TRAMITE_MIGRACION_NICARAGUA_STDEV = 8.2
+
+########################################
+# VARIABLES FOR COLA ADUANA| NICARAGUA #
+########################################
+COLA_ADUANA_NICARAGUA_NAME = "COLA ADUANA NICARAGUA"
+COLA_ADUANA_NICARAGUA_CAP  = 1
+
+##################################
+# VARIABLES FOR ADUANA NICARAGUA #
+##################################
+TRAMITE_ADUANA_NICARAGUA_NAME  = "ADUANA NICARAGUA"
+TRAMITE_ADUANA_NICARAGUA_CAP   = 2
+TRAMITE_ADUANA_NICARAGUA_MEDIA = 61.15
+TRAMITE_ADUANA_NICARAGUA_STDEV = 15.5
+
+#######################################
+# VARIABLES FOR COLA salida NICARAGUA #
+#######################################
+COLA_SALIDA_NICARAGUA_NAME = "COLA SALIDA NICARAGUA"
+COLA_SALIDA_NICARAGUA_CAP  = 41
+
+#####################################
+# VARIABLES FOR MIGRACION NICARAGUA #
+#####################################
+TRAMITE_SALIDA_NICARAGUA_NAME  = "SALIDA NICARAGUA"
+TRAMITE_SALIDA_NICARAGUA_CAP   = 2
+TRAMITE_SALIDA_NICARAGUA_MEDIA = 161.3
+TRAMITE_SALIDA_NICARAGUA_STDEV = 40.3
 
 
 
@@ -133,6 +182,7 @@ TRAMITE_CONTROL_NICARAGUA_STDEV = 40
 ##################
 
 simulacion = Simulacion(TOTAL_NUMBER_OF_TRANSPORTS)
+simulacion.setAdditionLambdas(LAMBDAS)
 
 
 ########################
@@ -146,24 +196,34 @@ simulacion = Simulacion(TOTAL_NUMBER_OF_TRANSPORTS)
 ###################
 # COLA DE INGRESO #
 ###################
-
 # 1ER ITEM DE SECUENCIA
-colaDeIngreso = Cola(COLA_DE_INGRESO_NAME, TOTAL_NUMBER_OF_TRANSPORTS)
+simulacion.addSequenceElement(Cola(COLA_DE_INGRESO_NAME, \
+								TOTAL_NUMBER_OF_TRANSPORTS))
 
-######################
-# TRAMITE DE ADUANAS #
-######################
-
+########################
+# TRAMITE DE MIGRACION #
+########################
 # 2DO ITEM DE SECUENCIA
-tramiteDeAduanas = Proceso(TRAMITE_DE_MIGRACION_NAME, TRAMITE_DE_MIGRACION_CAP,\
-						TRAMITE_DE_MIGRACION_MEDIA, TRAMITE_DE_MIGRACION_STDEV)
+simulacion.addSequenceElement(Proceso(TRAMITE_DE_MIGRACION_NAME, \
+									TRAMITE_DE_MIGRACION_CAP,    \
+									TRAMITE_DE_MIGRACION_MEDIA,  \
+									TRAMITE_DE_MIGRACION_STDEV))
 
 ###################
 # COLA DE ADUANAS #
 ###################
-
 # 3ER ITEM DE SECUENCIA
-colaDeAduanas = cola(COLA_DE_ADUANAS_NAME,COLA_DE_ADUANAS_CAP)
+simulacion.addSequenceElement(Cola(COLA_DE_ADUANAS_NAME,COLA_DE_ADUANAS_CAP))
+
+######################
+# TRAMITE DE ADUANAS #
+######################
+# 4TO ITEM DE SECUENCIA
+simulacion.addSequenceElement(Proceso(TRAMITE_DE_ADUANAS_NAME, \
+									TRAMITE_DE_ADUANAS_CAP,    \
+									TRAMITE_DE_ADUANAS_MEDIA,  \
+									TRAMITE_DE_ADUANAS_STDEV))
+
 
 
 ############################
